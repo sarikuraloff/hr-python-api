@@ -5,6 +5,7 @@ from calc import calculate_compensation
 
 app = FastAPI()
 
+# 🔥 ОБЯЗАТЕЛЬНО ДЛЯ TELEGRAM MINI APP
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,3 +37,8 @@ def calculate(data: CalcRequest):
         bs_old=data.bs_old,
         bs_new=data.bs_new,
     )
+
+# 👇 для проверки, что API жив
+@app.get("/")
+def root():
+    return {"status": "ok"}
