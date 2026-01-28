@@ -5,14 +5,19 @@ from calc import calculate_compensation
 
 app = FastAPI()
 
-# 🔥 ОБЯЗАТЕЛЬНО ДЛЯ TELEGRAM MINI APP
+# ✅ CORS (обязательно для Mini App)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # можно потом ограничить
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ health check (чтобы Render не ругался)
+@app.get("/")
+def root():
+    return {"status": "ok"}
 
 class CalcRequest(BaseModel):
     d1: str
@@ -26,19 +31,13 @@ class CalcRequest(BaseModel):
 
 @app.post("/calculate")
 def calculate(data: CalcRequest):
-    used_total = data.used_work + data.used_cal
-
     return calculate_compensation(
         d1=data.d1,
         d2=data.d2,
-        used_total=used_total,
+        used_old=data.used_work,
+        used_new=data.used_cal,
         prog_old=data.prog_old,
         prog_new=data.prog_new,
         bs_old=data.bs_old,
         bs_new=data.bs_new,
     )
-
-# 👇 для проверки, что API жив
-@app.get("/")
-def root():
-    return {"status": "ok"}
